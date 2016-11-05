@@ -1,0 +1,20 @@
+upstream backend {
+    # This file is managed by Chef.
+    <% case node['loadbalancer']['balancing_method'] -%>
+    <% when 'ip_hash' -%>
+    ip_hash;
+    <% when 'least_conn' -%>
+    least_conn;
+    <% end -%>
+    <% @upstream_servers.each do |ip_address| -%>
+    server <%= ip_address %>;
+    <% end -%>
+}
+
+server {
+    listen 80;
+
+    location / {
+        proxy_pass http://backend;
+    }
+}
